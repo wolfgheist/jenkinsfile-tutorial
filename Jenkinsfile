@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/wolfgheist/jenkinsfile-tutorial'
+                git branch: 'main', url: 'https://github.com/wolfgheist/jenkinsfile-tutorial'
             }
         }
 
