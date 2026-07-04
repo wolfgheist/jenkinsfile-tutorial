@@ -1,24 +1,27 @@
 pipeline {
     agent any
+    environment {
+        IMAGE_NAME = 'ghcr.io/wolfgheist/jenkinsfile-tutorial'
+    }
     stages {
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/wolfgheist/jenkinsfile-tutorial'
             }
         }
-        stage('Build') {
+        stage('Build Docker image') {
             steps {
-                sh 'echo "Building the app"'
+                sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
-        stage('Test') {
+        stage('Push to GHCR') {
             steps {
-                sh 'echo "Running tests"'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh 'echo "Deploying application"'
+                withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                    sh """
+                    echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
+                    docker push ${IMAGE_NAME}:latest
+                    """
+                }
             }
         }
     }
