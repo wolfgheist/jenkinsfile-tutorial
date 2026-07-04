@@ -2,19 +2,27 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/wolfgheist/jenkinsfile-tutorial'
+            }
+        }
+
         stage('Build') {
             steps {
-                echo 'Building the project...'
+                sh 'echo "Building the app"'
             }
         }
+
         stage('Test') {
             steps {
-                echo 'Running tests...'
+                sh 'echo "Running tests"'
             }
         }
+
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
+                sh 'echo "Deploying application"'
             }
         }
     }
