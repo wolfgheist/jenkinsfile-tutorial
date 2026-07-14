@@ -1,7 +1,21 @@
 pipeline {
   agent any
 
+  environment {
+    AWS_REGION     = 'us-east-2'
+    ECR_REGISTRY   = '386318011177.dkr.ecr.us-east-2.amazonaws.com'
+    ECR_REPOSITORY = 'test'
+    IMAGE_NAME     = 'test-flask'
+    IMAGE_TAG      = 'latest'
+  }
+
   stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
     stage('set up the venv') {
       steps {
         sh '''
@@ -23,6 +37,32 @@ pipeline {
             echo 'No tests were found; continuing.'
           }
         }
+      }
+    }
+
+    stage('Login to ECR') {
+      steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+          sh '''
+            aws ecr get-login-password --region "$AWS_REGION" | \
+            docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          '''
+        }
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+          docker tag "$IMAGE_NAME:$IMAGE_TAG" "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        '''
+      }
+    }
+
+    stage('Push to ECR') {
+      steps {
+        sh 'docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"'
       }
     }
   }
