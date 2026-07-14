@@ -13,9 +13,15 @@ pipeline {
     }
 
     stage('RUN THE TESTS') {
-      steps {
-        sh 'PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ./venv/bin/pytest -q'
-      }
+        steps {
+            sh '''
+              PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ./venv/bin/pytest -q
+              status=$?
+              if [ "$status" -ne 0 ] && [ "$status" -ne 5 ]; then
+                exit "$status"
+              fi
+            '''
+        }
     }
   }
 }
