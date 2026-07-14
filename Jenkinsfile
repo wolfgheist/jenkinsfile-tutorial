@@ -14,7 +14,7 @@ pipeline {
 
     stage('RUN THE TESTS') {
       steps {
-        sh './venv/bin/python -m unittest discover -s tests'
+        sh './venv/bin/pytest -q'
       }
     }
   }
