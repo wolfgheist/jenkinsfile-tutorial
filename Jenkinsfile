@@ -1,24 +1,23 @@
-pipeline{
+pipeline {
   agent any
-  environment{
+
+  environment {
     VENV = 'venv'
   }
-  stages{
-    stage('Checkout git'){
-      steps{
-        git branch: 'main', url: 'https://github.com/Parth2k3/test-flask'
+
+  stages {
+    stage('set up the venv') {
+      steps {
+        sh 'python3 -m venv $VENV'
+        sh '. $VENV/bin/activate'
+        sh 'python -m pip install --upgrade pip'
+        sh 'pip install -r requirements.txt'
       }
     }
-    stage('set up the venv'){
-      steps{
-        bat 'python -m venv %VENV%'
-        bat '%VENV%\\Scripts\\python -m pip install --upgrade pip'
-        bat '%VENV%\\Scripts\\pip install -r requirements.txt'
-      }
-    }
-    stage('RUN THE TESTS'){
-      steps{
-        bat '%VENV%\\Scripts\\python -m unittest discover -s tests'
+
+    stage('RUN THE TESTS') {
+      steps {
+        sh 'python -m unittest discover -s tests'
       }
     }
   }
