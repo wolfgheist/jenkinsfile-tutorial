@@ -8,16 +8,16 @@ pipeline {
   stages {
     stage('set up the venv') {
       steps {
-        sh 'python3 -m venv $VENV'
-        sh '. $VENV/bin/activate'
-        sh 'python -m pip install --upgrade pip'
-        sh 'pip install -r requirements.txt'
+        sh 'python3 -m venv venv'
+        sh '. venv/bin/activate'
+        sh 'python3 -m pip install --upgrade pip'
+        sh 'python3 -m pip install -r requirements.txt'
       }
     }
 
     stage('RUN THE TESTS') {
       steps {
-        sh 'python -m unittest discover -s tests'
+        sh 'python3 -m unittest discover -s tests'
       }
     }
   }
